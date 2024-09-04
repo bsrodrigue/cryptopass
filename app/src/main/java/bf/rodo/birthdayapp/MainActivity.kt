@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,27 +16,45 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import bf.rodo.birthdayapp.ui.theme.BirthdayAppTheme
+
+val primary = 0xFF6C48C5
+val secondary = 0xFFC68FE6
+val tertiary = 0xFFFFF7F7
+val black = 0xFF000000
+
+val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+
+val fontName = GoogleFont("Kanit")
+
+val fontFamily = FontFamily(
+    Font(
+        googleFont = fontName,
+        fontProvider = provider
+    )
+)
 
 val charsetMap: Map<String, List<Char>> = mapOf(
     "uppercase" to ('A'..'Z').toList(),
@@ -61,134 +81,70 @@ fun genPassword(length: Int, charset: List<Char>): String {
         .joinToString("")
 }
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var passwordLength by remember { mutableStateOf("") }
-            var isActiveDigits by remember { mutableStateOf(false) }
-            var isActiveUppercase by remember { mutableStateOf(false) }
-            var isActiveLowercase by remember { mutableStateOf(false) }
-            var isActiveSpecial by remember { mutableStateOf(false) }
-
-            var passwords by remember {
-                mutableStateOf(
-                    listOf(
-                        genPassword(
-                            10,
-                            getCharset(listOf("uppercase", "lowercase", "digits", "special"))
-                        ),
-                    )
-                )
-            }
 
             BirthdayAppTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = {
-                            }
-                        ) {
-                            Text("Create Password")
-                        }
-                    },
-
                     content = { paddingValues ->
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(paddingValues)
+                                .background(color = Color.White)
                         ) {
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                PasswordList(items = passwords, onClickDelete = { it ->
-                                    val password = it
-                                    passwords = passwords.filter { it ->
-                                        it != password
-                                    }
-                                })
-                                TextField(
-                                    modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = Dp(10f)),
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                    ),
-                                    singleLine = true,
-                                    label = {
-                                        Text("Password Length")
-                                    },
-                                    placeholder = {
-                                        Text("Enter length of your password")
-                                    },
-                                    value = passwordLength, onValueChange = {
-                                        passwordLength = it
-                                    })
-
-                                CustomCheckbox(
-                                    "Digit (numbers)",
-                                    checked = isActiveDigits,
-                                    onCheckedChange = {
-                                        isActiveDigits = it
-                                    },
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 30.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "CryptoPass",
+                                    fontFamily = fontFamily,
+                                    color = Color(primary),
+                                    fontSize = TextUnit(value = 5f, type = TextUnitType.Em),
                                 )
 
-                                CustomCheckbox("Uppercase",
-                                    checked = isActiveUppercase,
-                                    onCheckedChange = {
-                                        isActiveUppercase = it
-                                    })
-
-                                CustomCheckbox("Lowercase",
-                                    checked = isActiveLowercase,
-                                    onCheckedChange = {
-                                        isActiveLowercase = it
-                                    })
-
-                                CustomCheckbox("Special", checked = isActiveSpecial,
-                                    onCheckedChange = {
-                                        isActiveSpecial = it
-                                    })
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.lock),
+                                        contentDescription = "Lock",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(50.dp),
+                                    )
+                                    Text(
+                                        "Easy Password Management",
+                                        color = Color(secondary),
+                                        fontSize = TextUnit(value = 3f, type = TextUnitType.Em),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        "Create Strong & Secure Passwords",
+                                        color = Color(primary),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
 
                                 Button(
                                     modifier = Modifier.fillMaxWidth(),
-                                    onClick = {
-                                        fun onClick() {
-
-                                            var charsetList: MutableList<String> = mutableListOf()
-
-                                            if (isActiveDigits) charsetList.add("digits")
-                                            if (isActiveUppercase) charsetList.add("uppercase")
-                                            if (isActiveLowercase) charsetList.add("lowercase")
-                                            if (isActiveSpecial) charsetList.add("special")
-
-                                            if (charsetList.size == 0 || passwordLength.isEmpty()) return
-
-                                            val password = genPassword(
-                                                passwordLength.toInt(),
-                                                getCharset(
-                                                    charsetList.toList()
-                                                )
-                                            )
-
-                                            passwords = passwords + password
-                                        }
-
-                                        onClick()
-                                    }
+                                    onClick = {}
                                 ) {
-                                    Text("Create password")
+                                    Text("Get Started")
                                 }
                             }
-
                         }
                     }
                 )
             }
         }
     }
+
 }
 
 @Composable
